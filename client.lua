@@ -185,7 +185,7 @@ function DoSpeedTest(encr)
                 if dist >= 1609.344 then
                     data.mile_speed = Round(speed, 2)
                     data.mile = (GetNetworkTimeAccurate() - StartTime) / 1000
-                    print(string.format("1 Mile: %0.2f sec.\n1 Speed: %0.2f MPH\nTheoratical Max Speed: %0.2f", data.half_mile, data.half_mile_speed, data.max_speed))
+                    print(string.format("1 Mile: %0.2f sec.\n1 Speed: %0.2f MPH\nTheoratical Max Speed: %0.2f", data.mile, data.mile_speed, data.max_speed))
 
                     if encr ~= nil then
                         TriggerServerEvent("tis-vehspeeds:server:SaveVehicleSpecs", encr, data)
@@ -379,7 +379,7 @@ function DoSpeedTarget(encr, target)
                 if dist >= 1609.344 then
                     data.mile_speed = Round(speed, 2)
                     data.mile = (GetNetworkTimeAccurate() - StartTime) / 1000
-                    print(string.format("1 Mile: %0.2f sec.\n1 Speed: %0.2f MPH\nTheoratical Max Speed: %0.2f", data.half_mile, data.half_mile_speed, data.max_speed))
+                    print(string.format("1 Mile: %0.2f sec.\n1 Speed: %0.2f MPH\nTheoratical Max Speed: %0.2f", data.mile, data.mile_speed, data.max_speed))
 
                     if encr ~= nil then
                         -- TriggerServerEvent("tis-vehspeeds:server:SaveVehicleSpecs", encr, data)
