@@ -1,7 +1,22 @@
 # Documentation
 
 ## tis-vehspeeds
-A script that adds 
+A script that adds a command to "train" a car to have the correct 0-60 speeds. It spits out the correct fInitialDriveForce in the console, so you will just need to add that to your `handling.meta`. It is advised to check the speeds of your car in the high speed range. If it doesn't reach the desired speed, adjust the `fInitialDragCoeff` accordingly.
+
+Another command is added (`speedtest` for single vehicle `speedtestlist` for the list saved in `config.lua`), it will perform an automated test on your vehicle that gets the following info:
+- 0-60 mph speed
+- 0-100 mph speed
+- 0.25 mile time
+- 0.25 mile speed
+- 0.5 mile time
+- 0.5 mile speed
+- 1 mile time
+- 1 mile speed 
+
+This also adds a database table where the results of speed tests are saved.
+
+## Plans
+- Create UI to view the speeds
 
 ## Dependencies
 - **[qb-core](https://github.com/qbcore-framework/qb-core)** (for adding commands, can be replaced with natives if you want to use this standalone)
