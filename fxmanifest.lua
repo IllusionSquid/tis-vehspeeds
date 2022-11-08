@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'The Illusion Squid'
 version '1.0.0'
-description 'Skydiving script'
+description 'Vehicle speeds'
 
 client_scripts {
 	"client.lua",
