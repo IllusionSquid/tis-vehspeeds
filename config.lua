@@ -1,13 +1,9 @@
--- Copyright 2021, The Illusion Squid, All rights reserved.
 Config = {}
 Config.Version = "1.0.0"
 
 Config.SpeedTest = {
     TrackObject = "stt_prop_stunt_track_straight",
-    -- TrackObject = "stt_prop_track_straight_bar_l",
     TrackPos = vector3(195.03, -3263.48, 2000),
-    -- StartPos = vector4(-1009.15, -3324.71, 18.39, 60),
-    -- EndPos =  vector4(-1592.47, -2800.95, 13.41, 60),
     Vehicles = { -- Add modelname here for the list of models to test when the command /speedtestlist is ran
         -- Compacts -----------------------------------------------------------------------------------------------------
         -- "asbo",
