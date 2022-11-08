@@ -12,7 +12,6 @@ local Tracks = {}
 
 -- Performance locals
 local floor = math.floor
-local abs = math.abs;
 
 local setConstants = function ()
     topspeedGTA = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveMaxFlatVel")
@@ -40,8 +39,6 @@ Citizen.CreateThread(function ()
             if vehicle ~= nil then
                 -- Resetting the old vehicle
                 resetVehicle()
-                -- SendNUIMessage({action = "show", toggle = false})
-                -- HUDOn = false
             end
         else
             -- Check if the player is the driver
@@ -106,14 +103,6 @@ end
 
 function DoSpeedTest(encr)
     if vehicle ~= nil then
-        -- Set position of vehicle for testing
-        -- SetEntityCoords(vehicle, Config.SpeedTest.TrackPos + vector3(0, 0, 110))
-        -- SetEntityHeading(vehicle, 0)
-
-        -- SetControlNormal(0, 157, 1.0) -- Set Gear to 1
-
-        -- Citizen.Wait(2000) -- Needed for vehicle to land
-
         SetEntityStartPos()
 
         local StartPos = GetEntityCoords(vehicle)
@@ -127,16 +116,6 @@ function DoSpeedTest(encr)
                 Citizen.Wait(0)
             end
         end)
-
-        -- TaskVehicleDriveToCoordLongrange(
-        --     GetPlayerPed(-1) --[[ Ped ]], 
-        --     vehicle --[[ Vehicle ]], 
-        --     Config.SpeedTest.TrackPos + vector3(800, 0, 100),
-        --     100 --[[ number ]], 
-        --     21757952 --[[ integer ]], 
-        --     0 --[[ number ]]
-        -- )
-
 
         -- Data gathering
         Citizen.CreateThread(function ()
@@ -252,8 +231,6 @@ end
 function TargetIteration(target, lastResult, currentAcceleration, previousAcceleration)
     SetEntityStartPos()
 
-    -- print(currentAcceleration, previousAcceleration)
-
     -- Set new IDF if this is not the first time
     if lastResult ~= nil then
         local newAcceleration = GetNewIDF(target, lastResult, currentAcceleration, previousAcceleration)
@@ -285,8 +262,6 @@ function TargetIteration(target, lastResult, currentAcceleration, previousAccele
     end)
 
     while inIteration do
-        -- local pos = GetEntityCoords(vehicle)
-        -- local dist = GetDistanceBetweenCoords(pos, StartPos)
         local speed = GetEntitySpeed(vehicle) * 2.236936
 
         if speed >= 60 then
@@ -303,111 +278,10 @@ function TargetIteration(target, lastResult, currentAcceleration, previousAccele
     end
 end
 
-function DoSpeedTarget(encr, target)
-    if vehicle ~= nil then
-        -- Set position of vehicle for testing
-        SetEntityCoords(vehicle, Config.SpeedTest.TrackPos + vector3(0, 0, 110))
-        SetEntityHeading(vehicle, 0)
-        local priviousAcceleration = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce")
-        local currentAcceleration = priviousAcceleration
-
-        SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce", newacc)
-
-        SetControlNormal(0, 157, 1.0) -- Set Gear to 1
-
-        Citizen.Wait(2000) -- Needed for vehicle to land
-
-        local StartPos = GetEntityCoords(vehicle)
-        local StartTime = GetNetworkTimeAccurate()
-
-        InSpeedTest = true
-        local targetTest = true
-
-        -- Press gas
-        Citizen.CreateThread(function ()
-            while InSpeedTest do
-                SetControlNormal(0, 71, 1.0)
-                Citizen.Wait(0)
-            end
-        end)
-
-
-        -- Data gathering
-        Citizen.CreateThread(function ()
-            local data = {
-                model = vehHash,
-                model_name = GetDisplayNameFromVehicleModel(vehHash):lower(),
-                model_class = GetVehicleClass(vehicle),
-                zero_sixty = nil,
-                zero_hundered = nil,
-                quarter_mile = nil,
-                quarter_mile_speed = nil,
-                half_mile = nil,
-                half_mile_speed = nil,
-                max_speed = Round((topspeedGTA * 0.8), 2),
-
-            }
-
-            while InSpeedTest do
-                local pos = GetEntityCoords(vehicle)
-                local dist = GetDistanceBetweenCoords(pos, StartPos)
-                local speed = GetEntitySpeed(vehicle) * 2.236936
-
-                if data.zero_sixty == nil and speed >= 60 then
-                    data.zero_sixty = (GetNetworkTimeAccurate() - StartTime) / 1000
-                    print(string.format("0-60: %0.2f sec.", data.zero_sixty))
-                end
-
-                if data.zero_hundered == nil and speed >= 100 then
-                    data.zero_hundered = (GetNetworkTimeAccurate() - StartTime) / 1000
-                    print(string.format("0-100: %0.2f sec.", data.zero_hundered))
-                end
-
-                if data.quarter_mile == nil and dist >= 402.336 then
-                    data.quarter_mile = (GetNetworkTimeAccurate() - StartTime) / 1000
-                    data.quarter_mile_speed = Round(speed, 2)
-                    print(string.format("1/4 Mile: %0.2f sec.\n1/4 Speed: %0.2f MPH", data.quarter_mile, data.quarter_mile_speed))
-                end
-
-                if data.half_mile == nil and dist >= 804.672 then
-                    data.half_mile_speed = Round(speed, 2)
-                    data.half_mile = (GetNetworkTimeAccurate() - StartTime) / 1000
-                    print(string.format("1/2 Mile: %0.2f sec.\n1/2 Speed: %0.2f MPH", data.half_mile, data.half_mile_speed))
-
-                end
-
-                if dist >= 1609.344 then
-                    data.mile_speed = Round(speed, 2)
-                    data.mile = (GetNetworkTimeAccurate() - StartTime) / 1000
-                    print(string.format("1 Mile: %0.2f sec.\n1 Speed: %0.2f MPH\nTheoratical Max Speed: %0.2f", data.mile, data.mile_speed, data.max_speed))
-
-                    if encr ~= nil then
-                        -- TriggerServerEvent("tis-vehspeeds:server:SaveVehicleSpecs", encr, data)
-                    end
-
-                    -- Stop the vehicle
-                    FreezeEntityPosition(vehicle, true)
-                    FreezeEntityPosition(vehicle, false)
-
-                    -- Turn off speed test
-                    InSpeedTest = false
-                    return
-                end
-                Citizen.Wait(0)
-            end
-        end)
-        print("Doing speedtest for "..GetDisplayNameFromVehicleModel(vehHash))
-    else
-        print("Must be in a proper vehicle")
-    end
-end
-
-
 RegisterNetEvent("tis-vehspeeds:client:DoSpeedTest")
 AddEventHandler("tis-vehspeeds:client:DoSpeedTest", function (encr, model)
     createTrack()
     -- SetEntityCoords(GetPlayerPed(-1), Config.SpeedTest.TrackPos + vector3(0, 0, 100))
-    print("ofjaoijroejwo")
     prepSpeedTest(model)
     DoSpeedTest(encr)
     while InSpeedTest do
@@ -420,10 +294,9 @@ RegisterNetEvent("tis-vehspeeds:client:DoSpeedTarget")
 AddEventHandler("tis-vehspeeds:client:DoSpeedTarget", function (encr, model, target)
     createTrack()
     -- SetEntityCoords(GetPlayerPed(-1), Config.SpeedTest.TrackPos + vector3(0, 0, 100))
-    print("ofjaoijroejwo")
     prepSpeedTest(model)
     print(target)
-    -- DoSpeedTarget(encr, target)
+
     local currentAcceleration = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce")
     local newAcceleration = TargetIteration(target, nil, currentAcceleration, nil)
     print(newAcceleration)
