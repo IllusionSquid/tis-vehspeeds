@@ -29,11 +29,6 @@ QBCore.Commands.Add("speedtestlist", "Do speed test on the list in config.lua", 
     TriggerClientEvent("tis-vehspeeds:client:DoSpeedTestList", source, Encryptions[source])
 end, "admin")
 
--- RegisterCommand("speedtestlist", function(source, args, rawCommand)
---     Encryptions[source] = randomString(16)
---     TriggerClientEvent("tis-vehspeeds:client:DoSpeedTestList", source, Encryptions[source])
--- end, true)
-
 QBCore.Commands.Add("speedtarget", "\"Train\" model for target speed", {{name = "model", help = "The model to speedtest"}, {name = "target", help = "Target 0-60mph (Float e.g.: 5.7)"}}, true, function(source, args)
     if #args < 2 then
         TriggerClientEvent('QBCore:Notify', source, "Please pass arguments", "error")
@@ -43,12 +38,6 @@ QBCore.Commands.Add("speedtarget", "\"Train\" model for target speed", {{name = 
     Encryptions[source] = randomString(16)
     TriggerClientEvent("tis-vehspeeds:client:DoSpeedTarget", source, Encryptions[source], args[1], tonumber(args[2]))
 end, "admin")
-
--- RegisterCommand("speedtarget", function(source, args, rawCommand)
---     Encryptions[source] = randomString(16)
---     TriggerClientEvent("tis-vehspeeds:client:DoSpeedTarget", source, Encryptions[source], args[1], tonumber(args[2]))
---     print("afioreoai")
--- end, true)
 
 RegisterServerEvent("tis-vehspeeds:server:SaveVehicleSpecs")
 AddEventHandler("tis-vehspeeds:server:SaveVehicleSpecs", function (encrypt, data)
