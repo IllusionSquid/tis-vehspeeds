@@ -102,7 +102,7 @@ function DoSpeedTest(vehicle, encr)
         quarter_mile_speed = nil,
         half_mile = nil,
         half_mile_speed = nil,
-        max_speed = Round((GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveMaxFlatVel") * 0.8), 2),
+        max_speed = Round((GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveMaxFlatVel") * 0.82), 2),
 
     }
 
