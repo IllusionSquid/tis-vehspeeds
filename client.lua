@@ -175,7 +175,7 @@ function GetNewIDF(target, lastResult, currentAcceleration, previousAcceleration
                 return currentAcceleration - (currentAcceleration - previousAcceleration) / 2
             else
                 local difference = (previousAcceleration - currentAcceleration)
-                if difference <= 0 then
+                if currentAcceleration - difference <= 0 then
                     return currentAcceleration / 2
                 else
                     return currentAcceleration - difference
