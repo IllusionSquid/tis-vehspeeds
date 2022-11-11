@@ -267,6 +267,9 @@ AddEventHandler("tis-vehspeeds:client:DoSpeedTarget", function (encr, model, tar
     local currentAcceleration = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce")
     local newAcceleration = TargetIteration(vehicle, target, nil, currentAcceleration, nil)
     print(newAcceleration)
+    SendNUIMessage({
+        copy = newAcceleration
+    })
     SetEntityCoords(vehicle, pos)
     removeTrack()
 end)
