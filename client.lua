@@ -38,9 +38,9 @@ function ReqMod(model)
     end
 end
 
-local prepSpeedTest = function (model)
+local function prepSpeedTest(model)
     TriggerEvent("QBCore:Command:DeleteVehicle")
-    -- resetVehicle()
+
     TriggerEvent("QBCore:Command:SpawnVehicle", model)
     local x = 0
     while GetVehiclePedIsIn(PlayerPedId(), false) == 0 do
@@ -53,7 +53,7 @@ local prepSpeedTest = function (model)
     return GetVehiclePedIsIn(PlayerPedId(), false)
 end
 
-local createTrack = function ()
+local function createTrack()
     ReqMod(Config.SpeedTest.TrackObject)
     for i = 0, 19, 1 do
         local track = CreateObject(Config.SpeedTest.TrackObject, Config.SpeedTest.TrackPos + vector3(0, i * 90, 0), true)
@@ -61,7 +61,7 @@ local createTrack = function ()
     end
 end
 
-local removeTrack = function ()
+local function removeTrack()
     for k, track in pairs(Tracks) do
         DeleteObject(track)
         Tracks[k] = nil
@@ -91,7 +91,7 @@ function DoSpeedTest(vehicle, encr)
         end
     end)
 
-        -- Data gathering
+    -- Data gathering
     local data = {
         model = vehHash,
         model_name = GetDisplayNameFromVehicleModel(vehHash):lower(),
@@ -114,9 +114,7 @@ function DoSpeedTest(vehicle, encr)
         if data.zero_sixty == nil and speed >= 60 then
             data.zero_sixty = (GetNetworkTimeAccurate() - StartTime) / 1000
             print(string.format("0-60: %0.2f sec.", data.zero_sixty))
-        end
-
-        if data.zero_hundered == nil and speed >= 100 then
+        elseif data.zero_hundered == nil and speed >= 100 then
             data.zero_hundered = (GetNetworkTimeAccurate() - StartTime) / 1000
             print(string.format("0-100: %0.2f sec.", data.zero_hundered))
         end
@@ -125,16 +123,13 @@ function DoSpeedTest(vehicle, encr)
             data.quarter_mile = (GetNetworkTimeAccurate() - StartTime) / 1000
             data.quarter_mile_speed = Round(speed, 2)
             print(string.format("1/4 Mile: %0.2f sec.\n1/4 Speed: %0.2f MPH", data.quarter_mile, data.quarter_mile_speed))
-        end
 
-        if data.half_mile == nil and dist >= 804.672 then
+        elseif data.half_mile == nil and dist >= 804.672 then
             data.half_mile_speed = Round(speed, 2)
             data.half_mile = (GetNetworkTimeAccurate() - StartTime) / 1000
             print(string.format("1/2 Mile: %0.2f sec.\n1/2 Speed: %0.2f MPH", data.half_mile, data.half_mile_speed))
 
-        end
-
-        if dist >= 1609.344 then
+        elseif dist >= 1609.344 then
             data.mile_speed = Round(speed, 2)
             data.mile = (GetNetworkTimeAccurate() - StartTime) / 1000
             print(string.format("1 Mile: %0.2f sec.\n1 Speed: %0.2f MPH\nTheoratical Max Speed: %0.2f", data.mile, data.mile_speed, data.max_speed))
@@ -155,7 +150,7 @@ function DoSpeedTest(vehicle, encr)
     end
 end
 
--- Calculate a new InitialDriveForce based on our last result and previous acceleration
+-- Calculate a new InitialDriveForce (IDF) based on our last result and previous acceleration
 function GetNewIDF(target, lastResult, currentAcceleration, previousAcceleration)
     if target - lastResult < -0.05 then -- Too slow
         print("too slow", lastResult, currentAcceleration, previousAcceleration)
@@ -189,6 +184,13 @@ function GetNewIDF(target, lastResult, currentAcceleration, previousAcceleration
     end
 end
 
+function SetIDF(vehicle, fInitialDriveForce)
+    local engineup = GetVehicleMod(vehicle, 11)
+    SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce", fInitialDriveForce)
+    ModifyVehicleTopSpeed(vehicle, 1)
+    SetVehicleMod(vehicle, 11, engineup, false) -- Needed for changes to take affect
+end
+
 function TargetIteration(vehicle, target, lastResult, currentAcceleration, previousAcceleration)
     SetEntityStartPos(vehicle)
 
@@ -200,10 +202,7 @@ function TargetIteration(vehicle, target, lastResult, currentAcceleration, previ
             return currentAcceleration
         end
 
-        local engineup = GetVehicleMod(vehicle, 11)
-        SetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDriveForce", newAcceleration)
-        ModifyVehicleTopSpeed(vehicle, 1)
-        SetVehicleMod(vehicle, 11, engineup, false) -- Needed for changes to take affect
+        SetIDF(vehicle, newAcceleration)
 
         previousAcceleration = currentAcceleration
         currentAcceleration = newAcceleration
